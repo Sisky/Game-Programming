@@ -1,0 +1,19 @@
+﻿Finished noughts and crosses game
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Your branch is up-to-date with 'origin/master'.
+#
+# Changes to be committed:
+#	modified:   Lab Work/Week 1/Lab1/Lab 1 Exercises/.vs/Lab 1 Exercises/v14/.suo
+#	modified:   Lab Work/Week 1/Lab1/Lab 1 Exercises/Debug/Noughts and Crosses.exe
+#	modified:   Lab Work/Week 1/Lab1/Lab 1 Exercises/Debug/Noughts and Crosses.ilk
+#	modified:   Lab Work/Week 1/Lab1/Lab 1 Exercises/Debug/Noughts and Crosses.pdb
+#	modified:   Lab Work/Week 1/Lab1/Lab 1 Exercises/Lab 1 Exercises.sdf
+#	modified:   Lab Work/Week 1/Lab1/Lab 1 Exercises/Noughts and Crosses/Debug/Noughts and Crosses.log
+#	modified:   Lab Work/Week 1/Lab1/Lab 1 Exercises/Noughts and Crosses/Debug/Source.obj
+#	modified:   Lab Work/Week 1/Lab1/Lab 1 Exercises/Noughts and Crosses/Debug/vc140.idb
+#	modified:   Lab Work/Week 1/Lab1/Lab 1 Exercises/Noughts and Crosses/Debug/vc140.pdb
+#	modified:   Lab Work/Week 1/Lab1/Lab 1 Exercises/Noughts and Crosses/Source.cpp
+#
+
