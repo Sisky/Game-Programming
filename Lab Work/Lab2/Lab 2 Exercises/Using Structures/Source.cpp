@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -21,10 +22,19 @@ void SetupPlayer(Player* player)
 
 void PrintPlayerDetails(const Player& player)
 {
+	string isAlive = "";
+	if (player.alive == 1)
+	{
+		isAlive += "Yes";
+	}
+	else
+	{
+		isAlive += "No";
+	}
 	cout << "Player's Current State" << endl;
 	cout << "- Position: (" << player.xPos << ", " << player.yPos << ")" << endl;
 	cout << "- Health: " << player.health << endl;
-	cout << "- Alive: " << player.alive << endl;
+	cout << "- Alive: " << isAlive << endl;
 
 
 
@@ -33,7 +43,12 @@ void PrintPlayerDetails(const Player& player)
 int main()
 {	
 	Player player;
-	SetupPlayer(&player);
+	Player player2;
 	PrintPlayerDetails(player);
+	PrintPlayerDetails(player2);
+	SetupPlayer(&player);
+	SetupPlayer(&player2);
+	PrintPlayerDetails(player);
+	PrintPlayerDetails(player2);
 	return 0;
 }
