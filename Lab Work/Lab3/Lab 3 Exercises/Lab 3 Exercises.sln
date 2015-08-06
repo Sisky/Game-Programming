@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Classes and Objects", "Lab 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Local vs Freestore Objects", "Loval vs Freestore Objects\Loval vs Freestore Objects.vcxproj", "{C6C35B46-9BF1-4743-8694-F7E37C0C5BBC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Object Factory", "Object Factory\Object Factory.vcxproj", "{A41FDC73-77C0-44E7-921E-DCC5E7B76509}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{C6C35B46-9BF1-4743-8694-F7E37C0C5BBC}.Release|x64.Build.0 = Release|x64
 		{C6C35B46-9BF1-4743-8694-F7E37C0C5BBC}.Release|x86.ActiveCfg = Release|Win32
 		{C6C35B46-9BF1-4743-8694-F7E37C0C5BBC}.Release|x86.Build.0 = Release|Win32
+		{A41FDC73-77C0-44E7-921E-DCC5E7B76509}.Debug|x64.ActiveCfg = Debug|x64
+		{A41FDC73-77C0-44E7-921E-DCC5E7B76509}.Debug|x64.Build.0 = Debug|x64
+		{A41FDC73-77C0-44E7-921E-DCC5E7B76509}.Debug|x86.ActiveCfg = Debug|Win32
+		{A41FDC73-77C0-44E7-921E-DCC5E7B76509}.Debug|x86.Build.0 = Debug|Win32
+		{A41FDC73-77C0-44E7-921E-DCC5E7B76509}.Release|x64.ActiveCfg = Release|x64
+		{A41FDC73-77C0-44E7-921E-DCC5E7B76509}.Release|x64.Build.0 = Release|x64
+		{A41FDC73-77C0-44E7-921E-DCC5E7B76509}.Release|x86.ActiveCfg = Release|Win32
+		{A41FDC73-77C0-44E7-921E-DCC5E7B76509}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
