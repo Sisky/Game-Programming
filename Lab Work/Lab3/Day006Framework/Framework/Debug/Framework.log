@@ -1,0 +1,21 @@
+﻿Build started 10/08/2015 3:08:28 p.m..
+     1>Project "C:\Users\Scott\game-programming\Lab Work\Lab3\Day006Framework\Framework\Framework.vcxproj" on node 2 (Build target(s)).
+     1>Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Scott\game-programming\Lab Work\Lab3\Day006Framework\Debug\Framework.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\Scott\game-programming\Lab Work\Lab3\Day006Framework\\SDL\SDL2-2.0.3\lib\x86" /LIBPATH:"C:\Users\Scott\game-programming\Lab Work\Lab3\Day006Framework\\SDL\SDL2_image-2.0.0\lib\x86" SDL2.lib SDL2main.lib SDL2_image.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\Scott\game-programming\Lab Work\Lab3\Day006Framework\Debug\Framework.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Scott\game-programming\Lab Work\Lab3\Day006Framework\Debug\Framework.lib" /MACHINE:X86 Debug\backbuffer.obj
+         Debug\entity.obj
+         Debug\game.obj
+         Debug\inputhandler.obj
+         Debug\logmanager.obj
+         Debug\main.obj
+         Debug\sprite.obj
+         Debug\texture.obj
+         Debug\texturemanager.obj
+     1>MSVCRTD.lib(initializers.obj) : warning LNK4098: defaultlib 'msvcrt.lib' conflicts with use of other libs; use /NODEFAULTLIB:library
+     1>SDL2main.lib(SDL_windows_main.obj) : error LNK2019: unresolved external symbol __imp__fprintf referenced in function _ShowError
+     1>SDL2main.lib(SDL_windows_main.obj) : error LNK2019: unresolved external symbol __imp____iob_func referenced in function _ShowError
+     1>C:\Users\Scott\game-programming\Lab Work\Lab3\Day006Framework\Debug\Framework.exe : fatal error LNK1120: 2 unresolved externals
+     1>Done Building Project "C:\Users\Scott\game-programming\Lab Work\Lab3\Day006Framework\Framework\Framework.vcxproj" (Build target(s)) -- FAILED.
+
+Build FAILED.
+
+Time Elapsed 00:00:00.67
