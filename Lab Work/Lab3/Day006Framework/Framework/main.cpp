@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
 	{
 		// No body.
 	}
-
+	
 	Game::DestroyInstance();
 
 	return (0);
