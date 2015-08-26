@@ -1,5 +1,7 @@
 
 #include "Player.h"
+#include "sprite.h"
+#include "backbuffer.h"
 
 Player::Player()
 	: Entity()
@@ -16,6 +18,9 @@ Player::~Player()
 void 
 Player::Process(float deltaTime)
 {
-	// Process the Player object
+
+
+
+	
 	Entity::Process(deltaTime);
 }

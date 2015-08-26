@@ -12,13 +12,17 @@
 #include "Enemy.h"
 #include "Bullet.h"
 #include "Background.h"
+#include "Platform.h"
 
 // Library includes:
 #include <cassert>
 #include <SDL.h>
+#include <iostream>
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
+const float tileSize = 36;
+
 
 Game&
 Game::GetInstance()
@@ -53,6 +57,7 @@ Game::Game()
 , m_lag(0)
 , m_pPlayer(0)
 , m_EnemyVector(0)
+, m_PlatVector(0)
 {
 	
 }
@@ -71,7 +76,7 @@ Game::~Game()
 bool 
 Game::Initialise()
 {
-	const int tileSize = 36;
+
 	const int width = tileSize * 22;
 	const int height = tileSize * 16;
 
@@ -97,24 +102,27 @@ Game::Initialise()
 	bg->Initialise(backG);
 	bg->SetPositionX(0.0f);
 	bg->SetPositionY(0.0f);
-	
 
+
+	
 	// Load the player sprite
 	Sprite* pPlayerSprite = m_pBackBuffer->CreateSprite("assets\\Player.png");
 
 	//Create the player sprite and set the position
 	m_pPlayer = new Player();
 	m_pPlayer->Initialise(pPlayerSprite);
-	m_pPlayer->SetPositionX(400.0f);
-	m_pPlayer->SetPositionY(500.0f);
+	m_pPlayer->SetPositionX(tileSize);
+	m_pPlayer->SetPositionY(tileSize * 14);
 
 
 	// Load the alien ship sprite
-
+	SpawnPlatform(0.0f , tileSize * 15);
+	SpawnPlatform(tileSize, tileSize * 15);
+	SpawnPlatform(tileSize*2, tileSize * 15);
+	SpawnPlatform(tileSize*3, tileSize * 15);
+	SpawnPlatform(tileSize * 3, tileSize * 13);
 	SpawnEnemy(700.0f, 500.0f);
-
-	
-	
+	SpawnEnemy(500.0f, 500.0f);
 
 	
 
@@ -193,9 +201,19 @@ Game::Process(float deltaTime)
 	{
 		(*bulletIterator)->Process(deltaTime);
 	}
+	//process all platforms
+		std::vector<Platform*>::iterator platIterator;
+		for (platIterator = m_PlatVector.begin();
+		platIterator != m_PlatVector.end();
+		++platIterator)
+		{
+			(*platIterator)->Process(deltaTime);
+		}
 
 	// Update the player object
 	m_pPlayer->Process(deltaTime);
+
+	//check for player vs platform
 
 	// Check for bullet vs alien enemy collisions...
 	// For each bullet
@@ -217,7 +235,18 @@ Game::Process(float deltaTime)
 			}
 		}
 	}
-		
+		//if collides with plat put on top
+		for (platIterator = m_PlatVector.begin(); platIterator != m_PlatVector.end(); ++platIterator)
+		{
+			if ((*platIterator)->IsCollidingWith(*m_pPlayer))
+			{
+				float platPos = (*platIterator)->GetPositionY();
+
+				m_pPlayer->SetPositionY(platPos - tileSize);
+				StopSpaceShipMovement();
+			}
+		}
+
 	// Remove any dead bullets from the container...
 	bulletIterator = m_BulletVector.begin();
 	while(bulletIterator != m_BulletVector.end())
@@ -261,6 +290,7 @@ Game::Draw(BackBuffer& backBuffer)
 	backBuffer.SetClearColour(0,0,0);
 	backBuffer.Clear();
 	bg->Draw(*m_pBackBuffer);
+	
 	// Draw all enemy aliens in container...
 	std::vector<Entity*>::iterator enemyIterator;
 	for(enemyIterator = m_EnemyVector.begin();
@@ -279,6 +309,15 @@ Game::Draw(BackBuffer& backBuffer)
 	{
 		(*bulletIterator)->Draw(backBuffer);
 	}
+	//draw platfomrs 
+	std::vector<Platform*>::iterator platIterator;
+	for (platIterator = m_PlatVector.begin();
+	platIterator != m_PlatVector.end();
+		++platIterator)
+	{
+		(*platIterator)->Draw(backBuffer);
+	}
+	
 
 	// Draw the player ship...
 	m_pPlayer->Draw(*m_pBackBuffer);
@@ -298,7 +337,7 @@ void
 Game::MoveSpaceShipLeft()
 {
 	// Tell the player ship to move left.
-	m_pPlayer->SetHorizontalVelocity(-5.0f);        
+	m_pPlayer->SetHorizontalVelocity(-2.0f);        
 }
 
 //Add the method to tell the player ship to move right...
@@ -306,9 +345,16 @@ void
 Game::MoveSpaceShipRight()
 {
 	// Tell the player ship to move left.
-	m_pPlayer->SetHorizontalVelocity(5.0f);        
+	m_pPlayer->SetHorizontalVelocity(2.0f);        
 }
-
+void
+Game::Jump()
+{
+	
+	m_pPlayer->SetVerticalVelocity(-2.0f);
+	
+	
+}
 // Space a Bullet in game.
 void 
 Game::FireSpaceShipBullet()
@@ -320,10 +366,12 @@ Game::FireSpaceShipBullet()
 	Bullet* pBullet = new Bullet();
 	pBullet->Initialise(pBulletSprite);
 
+	//set horizontal
+	pBullet->SetHorizontalVelocity(10.0f);
 	// Set the bullets vertical velocity.
-	pBullet->SetVerticalVelocity(-5.0f);
-	pBullet->SetPositionX(m_pPlayer->GetPositionX()+10.0f);
-	pBullet->SetPositionY(m_pPlayer->GetPositionY());
+	
+	pBullet->SetPositionX(m_pPlayer->GetPositionX()+6.0f);
+	pBullet->SetPositionY(m_pPlayer->GetPositionY()+7.0f);
 
 	// Add the new bullet to the bullet container.
 	m_BulletVector.push_back(pBullet);
@@ -333,10 +381,23 @@ void
 Game::StopSpaceShipMovement()
 {
 	m_pPlayer->SetHorizontalVelocity(0.0f);
+	m_pPlayer->SetVerticalVelocity(0.0f);
 }
 
 
 void 
+Game::SpawnPlatform(float x, float y)
+{
+	Platform* plat = new Platform();
+	Sprite* platSprite = m_pBackBuffer->CreateSprite("assets\\plat.png");
+	plat->Initialise(platSprite);
+	plat->SetPositionX(x);
+	plat->SetPositionY(y);
+	m_PlatVector.push_back(plat);
+	
+}
+
+void
 Game::SpawnEnemy(float x, float y)
 {
 	Enemy* e = new Enemy();

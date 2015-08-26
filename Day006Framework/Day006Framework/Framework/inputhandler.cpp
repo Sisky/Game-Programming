@@ -102,6 +102,9 @@ InputHandler::ProcessInput(Game& game)
 					game.FireSpaceShipBullet();
 				}
 				break;
+			case SDL_SCANCODE_W:
+				//jump
+				game.Jump();
 			}
 		}
 		else if(e.type == SDL_KEYUP)
@@ -110,6 +113,7 @@ InputHandler::ProcessInput(Game& game)
 			{
 			case SDL_SCANCODE_A:
 			case SDL_SCANCODE_D:
+			
 				{
 					// Move Right
 					game.StopSpaceShipMovement();

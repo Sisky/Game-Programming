@@ -13,7 +13,7 @@ class Player;
 class Entity;
 class Bullet;
 class Background;
-
+class Platform;
 
 class Game
 {
@@ -31,10 +31,12 @@ public:
 	void MoveSpaceShipRight();
 	void FireSpaceShipBullet();
 	void StopSpaceShipMovement();
+	void Jump();
 
 	void SpawnEnemy(float x, float y);
 	void SpawnExplosion(int x, int y);
-	
+	void SpawnPlatform(float x, float y);
+
 protected:
 	void Process(float deltaTime);
 	void Draw(BackBuffer& backBuffer);
@@ -67,10 +69,13 @@ protected:
 	// Game Entities:
 	Player* m_pPlayer;
 	Background* bg;
+	Platform* plat;
 
 
 	// Add an alien enemy container field.
 	std::vector<Entity*> m_EnemyVector;
+	//platforms
+	std::vector<Platform*> m_PlatVector;
 
 	// Add a bullet container field.
 	std::vector<Bullet*> m_BulletVector;

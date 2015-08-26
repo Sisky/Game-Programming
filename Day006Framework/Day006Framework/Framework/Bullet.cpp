@@ -13,7 +13,7 @@ Bullet::~Bullet()
 void 
 Bullet::Process(float deltatick)
 {
-	if(m_y >= 600.0f || m_y <= 0.0f)
+	if(m_y >= 600.0f || m_y <= 0.0f || m_x >= 800.0f || m_x <= 0.0f)
 	{
 		m_dead = true;
 	}
