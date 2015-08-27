@@ -8,6 +8,7 @@
 #include "texturemanager.h"
 #include "sprite.h"
 #include "texture.h"
+#include "animatedsprite.h"
 
 // Library includes:
 #include <SDL.h>
@@ -44,6 +45,10 @@ BackBuffer::Initialise(int width, int height)
 {
 	m_width = width;
 	m_height = height;
+
+
+
+
 
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0)
 	{
@@ -149,6 +154,41 @@ void
 BackBuffer::LogSDLError()
 {
 	LogManager::GetInstance().Log(SDL_GetError());
+}
+
+void
+BackBuffer::DrawAnimatedSprite(AnimatedSprite& sprite)
+{
+	SDL_Rect dest;
+	SDL_Rect src;
+	src.x = sprite.GetXFrame();
+	src.y = 0;
+	src.w = sprite.GetFrameWidth();
+	src.h = sprite.GetHeight();
+
+
+	dest.x = sprite.GetX();
+	dest.y = sprite.GetY();
+	dest.w = sprite.GetFrameWidth();
+	dest.h = sprite.GetHeight();
+
+	SDL_RenderCopy(m_pRenderer, sprite.GetTexture()->GetTexture(), &src, &dest);
+}
+
+AnimatedSprite*
+BackBuffer::CreateAnimatedSprite(const char* pcFilename)
+{
+	assert(m_pTextureManager);
+
+	Texture* pTexture = m_pTextureManager->GetTexture(pcFilename);
+
+	AnimatedSprite* pSprite = new AnimatedSprite();
+	if (!pSprite->Initialise(*pTexture))
+	{
+		LogManager::GetInstance().Log("Sprite Failed to Create!");
+	}
+
+	return (pSprite);
 }
 
 Sprite* 

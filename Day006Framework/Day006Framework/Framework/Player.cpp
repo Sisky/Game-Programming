@@ -11,7 +11,7 @@ Player::Player()
 	// Construct the player ship
 	jumping = false;
 	jumpTimer = -1;
-
+	m_left = false;
 
 }
 
@@ -19,6 +19,19 @@ Player::~Player()
 {
 
 }
+
+void 
+Player::SetLeft(bool left)
+{
+	m_left = left;
+}
+
+bool
+Player::IsLeft()
+{
+	return m_left;
+}
+
 
 void
 Player::SetJumpTimer(float timer)

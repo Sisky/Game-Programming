@@ -14,7 +14,7 @@
 #include "Background.h"
 #include "Platform.h"
 #include "Enemy.h"
-
+#include "Explosion.h"
 
 // Library includes:
 #include <cassert>
@@ -82,7 +82,7 @@ bool
 Game::Initialise()
 {
 
-	const int width = tileSize * 22;
+	const int width = tileSize * 30;
 	const int height = tileSize * 16;
 
 	m_pBackBuffer = new BackBuffer();
@@ -264,13 +264,22 @@ Game::Process(float deltaTime)
 		(*bulletIterator)->Process(deltaTime);
 	}
 	//process all platforms
-		std::vector<Platform*>::iterator platIterator;
-		for (platIterator = m_PlatVector.begin();
-		platIterator != m_PlatVector.end();
-		++platIterator)
-		{
-			(*platIterator)->Process(deltaTime);
-		}
+	std::vector<Platform*>::iterator platIterator;
+	for (platIterator = m_PlatVector.begin();
+	platIterator != m_PlatVector.end();
+	++platIterator)
+	{
+		(*platIterator)->Process(deltaTime);
+	}
+	//process explosions
+	std::vector<Explosion*>::iterator ExplosionIterator;
+	for (ExplosionIterator = Explosions.begin();
+	ExplosionIterator != Explosions.end();
+		++ExplosionIterator)
+	{
+		(*ExplosionIterator)->Process(deltaTime);
+		(*ExplosionIterator)->GetSprite()->Process(deltaTime);
+	}
 
 	// Update the player object
 	m_pPlayer->Process(deltaTime);
@@ -292,8 +301,10 @@ Game::Process(float deltaTime)
 			if((*bulletIterator)->IsCollidingWith(*(*enemyIterator)) == true)
 			{
 				// If collided, destory both and spawn explosion.
+				SpawnExplosion((*enemyIterator)->GetPositionX(), (*enemyIterator)->GetPositionY());
 				(*bulletIterator)->SetDead(true);
 				(*enemyIterator)->SetDead(true);
+				
 			}
 		}
 	}
@@ -342,8 +353,10 @@ Game::Process(float deltaTime)
 	{
 		if ((*enemyIterator)->IsCollidingWith(*m_pPlayer))
 		{
+			SpawnExplosion(m_pPlayer->GetPositionX(),m_pPlayer->GetPositionY());
 			m_pPlayer->SetPositionX(tileSize);
 			m_pPlayer->SetPositionY(tileSize);
+
 
 		}
 	}
@@ -424,7 +437,21 @@ Game::Process(float deltaTime)
 			++enemyIterator;
 		}
 	}
+	//remove explosions
+	std::vector<Explosion*>::iterator explosionIterator;
+	for (explosionIterator = Explosions.begin(); explosionIterator != Explosions.end();) {
 
+		Explosion* explode = *explosionIterator;
+
+		if (explode->IsDead()) {
+			delete explode;
+			explosionIterator = Explosions.erase(explosionIterator);
+		}
+		else {
+			explosionIterator++;
+		}
+
+	}
 	
 }
 
@@ -463,11 +490,20 @@ Game::Draw(BackBuffer& backBuffer)
 		(*bulletIterator)->Draw(backBuffer);
 	}
 	
+
+		
 	
 
+		
 	// Draw the player ship...
 	m_pPlayer->Draw(*m_pBackBuffer);
 	
+	//Draw explosions
+	std::vector<Explosion*>::iterator ExplosionIterator;
+	for (ExplosionIterator = Explosions.begin(); ExplosionIterator != Explosions.end(); ++ExplosionIterator)
+	{
+		(*ExplosionIterator)->Draw(backBuffer);
+	}
 	
 
 	backBuffer.Present();
@@ -483,7 +519,8 @@ void
 Game::MoveSpaceShipLeft()
 {
 	// Tell the player ship to move left.
-	m_pPlayer->SetHorizontalVelocity(-2.0f);      
+	m_pPlayer->SetHorizontalVelocity(-2.0f);     
+	m_pPlayer->SetLeft(true);
 	m_pPlayer->Initialise(left);
 }
 
@@ -492,7 +529,8 @@ void
 Game::MoveSpaceShipRight()
 {
 	// Tell the player ship to move left.
-	m_pPlayer->SetHorizontalVelocity(2.0f);      
+	m_pPlayer->SetHorizontalVelocity(2.0f);   
+	m_pPlayer->SetLeft(false);
 	m_pPlayer->Initialise(right);
 }
 void
@@ -510,20 +548,38 @@ Game::FireSpaceShipBullet()
 {
 	// Load the player bullet sprite.   
 	Sprite* pBulletSprite = m_pBackBuffer->CreateSprite("assets\\playerbullet.png");
+	Sprite* pBulletSpriteReverse = m_pBackBuffer->CreateSprite("assets\\playerbulletreverse.png");
 
 	// Create a new bullet object.
-	Bullet* pBullet = new Bullet();
-	pBullet->Initialise(pBulletSprite);
-
+	
+	//if facing left fire right to left
+	if (m_pPlayer->IsLeft())
+	{
+		Bullet* pBullet = new Bullet();
+		pBullet->Initialise(pBulletSpriteReverse);
+		pBullet->SetHorizontalVelocity(-5.0f);
+		pBullet->SetPositionX(m_pPlayer->GetPositionX() + 6.0f);
+		pBullet->SetPositionY(m_pPlayer->GetPositionY() + 7.0f);
+		m_BulletVector.push_back(pBullet);
+	}
+	//fire left to right
+	else
+	{
+		Bullet* pBullet = new Bullet();
+		pBullet->Initialise(pBulletSprite);
+		pBullet->SetHorizontalVelocity(5.0f);
+		pBullet->SetPositionX(m_pPlayer->GetPositionX() + 6.0f);
+		pBullet->SetPositionY(m_pPlayer->GetPositionY() + 7.0f);
+		m_BulletVector.push_back(pBullet);
+	}
 	//set horizontal
-	pBullet->SetHorizontalVelocity(10.0f);
+	
 	// Set the bullets vertical velocity.
 	
-	pBullet->SetPositionX(m_pPlayer->GetPositionX()+6.0f);
-	pBullet->SetPositionY(m_pPlayer->GetPositionY()+7.0f);
+	
 
 	// Add the new bullet to the bullet container.
-	m_BulletVector.push_back(pBullet);
+	
 }
 
 void
@@ -555,4 +611,31 @@ Game::SpawnEnemy(float x, float y)
 	e->SetPositionX(x);
 	e->SetPositionY(y);
 	m_EnemyVector.push_back(e);
+}
+
+void
+Game::SpawnExplosion(int x, int y)
+{
+	Explosion* explosion = new Explosion();
+	explosion->SetPositionX(x - 10);
+	explosion->SetPositionY(y - 10);
+
+
+
+	AnimatedSprite* exploding = m_pBackBuffer->CreateAnimatedSprite("assets\\explosion.png");
+	exploding->SetLooping(false);
+	exploding->SetFrameWidth(64);
+	exploding->SetFrameSpeed(0.05);
+	exploding->AddFrame(0);
+	exploding->AddFrame(64);
+	exploding->AddFrame(128);
+	exploding->AddFrame(192);
+	exploding->AddFrame(256);
+
+
+
+
+	explosion->Initialise(exploding);
+
+	Explosions.push_back(explosion);
 }

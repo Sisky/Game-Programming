@@ -5,6 +5,8 @@
 // Forward Declarations:
 class TextureManager;
 class Sprite;
+class AnimatedSprite;
+
 struct SDL_Window;
 struct SDL_Renderer;
 
@@ -28,8 +30,10 @@ public:
 	void DrawSprite(Sprite& sprite);
 	void DrawRectangle(int x1, int y1, int x2, int y2);
 	void DrawLine(int x1, int y1, int x2, int y2);
-
+	void DrawAnimatedSprite(AnimatedSprite& sprite);
+	
 	Sprite* CreateSprite(const char* pcFilename);
+	AnimatedSprite* CreateAnimatedSprite(const char* pcFilename);
 	
 protected:
 	void LogSDLError();

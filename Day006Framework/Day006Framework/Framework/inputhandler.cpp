@@ -83,28 +83,37 @@ InputHandler::ProcessInput(Game& game)
 		}
 		else if (e.type == SDL_KEYDOWN)
 		{
-			switch(e.key.keysym.scancode)
+			switch (e.key.keysym.scancode)
 			{
-			case SDL_SCANCODE_A:
+				case SDL_SCANCODE_A:
 				{
 					// Move left
 					game.MoveSpaceShipLeft();
 				}
 				break;
-			case SDL_SCANCODE_D:
+				case SDL_SCANCODE_D:
 				{
 					// Move Right
 					game.MoveSpaceShipRight();
 				}
 				break;
-			case SDL_SCANCODE_SPACE:				
+				case SDL_SCANCODE_SPACE:
 				{
 					game.FireSpaceShipBullet();
 				}
 				break;
-			case SDL_SCANCODE_W:
-				//jump
-				game.Jump();
+				case SDL_SCANCODE_W:
+				{
+					//jump
+					game.Jump();
+				}
+				break;
+				case SDL_SCANCODE_P:
+				{
+					//spawn enemy for debugging
+					game.SpawnEnemy(36 * 15, 36 * 14);
+				}
+				break;
 			}
 		}
 		else if(e.type == SDL_KEYUP)

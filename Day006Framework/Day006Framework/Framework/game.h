@@ -15,6 +15,7 @@ class Bullet;
 class Background;
 class Platform;
 class Enemy;
+class Explosion;
 
 class Game
 {
@@ -79,7 +80,7 @@ protected:
 	std::vector<Enemy*> m_EnemyVector;
 	//platforms
 	std::vector<Platform*> m_PlatVector;
-
+	std::vector<Explosion*> Explosions;
 	// Add a bullet container field.
 	std::vector<Bullet*> m_BulletVector;
 
