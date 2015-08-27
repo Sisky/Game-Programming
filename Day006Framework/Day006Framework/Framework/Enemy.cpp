@@ -5,13 +5,24 @@
 #include "sprite.h"
 #include "backbuffer.h"
 
-float patrolTimer = 300.0f;
+
 bool left = true;
 
 Enemy::Enemy()
 {
 	Entity::Entity();
 
+}
+void
+Enemy::SetLeft(bool left)
+{
+	m_left = left;
+}
+
+bool
+Enemy::IsLeft()
+{
+	return m_left;
 }
 
 Enemy::~Enemy()
@@ -22,22 +33,9 @@ Enemy::~Enemy()
 void
 Enemy::Process(float deltaTime)
 {
-	if (patrolTimer > 0)
-	{
-		patrolTimer--;
-	}
-	else
-	{
-		left = !left;
-		patrolTimer = 300.0f;
-	}
-	if (left)
-	{
-		m_velocityX = -1.0f;
-	}
-	else
-	{
-		m_velocityX = 1.0f;
-	}
+	//gravity
+	m_velocityY = 3.0f;
+	
+	
 	Entity::Process(deltaTime);
 }

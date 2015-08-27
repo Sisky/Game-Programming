@@ -46,19 +46,9 @@ Entity::Process(float deltaTime)
 	m_x += m_velocityX;
 	m_y += m_velocityY;
 
-	// : Boundary checking and position capping. 
-	if(m_x > 800)
-	{
-		// If the entity is going to go out of bounds bonce the entity
-		// back along the direction that it hit the boundary
-		m_x = 800;
-		m_velocityX *= -1.0f;
-	}
-	else if(m_x < 0)
-	{
-		m_x = 0;
-		m_velocityX *= -1.0f;
-	}
+	
+	
+	
 
 	if(m_y > 600)
 	{

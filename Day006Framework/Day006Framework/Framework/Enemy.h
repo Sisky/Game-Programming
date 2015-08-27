@@ -12,7 +12,10 @@ public:
 	~Enemy();
 
 	void Process(float deltaTime);
-
+	void SetLeft(bool left);
+	bool IsLeft();
+	bool m_left;
+	bool m_right;
 protected:
 
 private:

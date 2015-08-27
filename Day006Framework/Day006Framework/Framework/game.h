@@ -40,6 +40,7 @@ public:
 	void SpawnPlatform(float x, float y);
 	void SpawnLevel();
 	void SpawnAllEnemies();
+	void ReadMap();
 
 protected:
 	void Process(float deltaTime);

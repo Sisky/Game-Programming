@@ -2,6 +2,11 @@
 #include <cmath>
 
 
+// Local includes:
+#include "sprite.h"
+#include "backbuffer.h"
+
+
 Platform::Platform()
 {
 	Entity::Entity();
@@ -17,9 +22,17 @@ Platform::~Platform()
 void
 Platform::Process(float deltaTime)
 {
-	Entity::Process(deltaTime);
+	m_pSprite->SetX(static_cast<int>(m_x));
+	m_pSprite->SetY(static_cast<int>(m_y));
 
-	// Process things relating to this enemy like when it decides to fire.
+	// : Generic position update, based upon velocity (and time).
+	m_x += m_velocityX;
+	m_y += m_velocityY;
+
+	// : Boundary checking and position capping. 
+
+
+
 }
 bool
 Platform::IsCollidingWith(Entity& e)

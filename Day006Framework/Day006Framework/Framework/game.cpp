@@ -15,11 +15,18 @@
 #include "Platform.h"
 #include "Enemy.h"
 #include "Explosion.h"
+#include "fmod.hpp"
+#include "fmod_errors.h"
+#include "fmod_common.h"
+
 
 // Library includes:
+#include <string>
 #include <cassert>
 #include <SDL.h>
 #include <iostream>
+#include <fstream>
+
 
 // Static Members:
 Game* Game::sm_pInstance = 0;
@@ -27,6 +34,12 @@ const float tileSize = 36;
 Sprite* left;
 Sprite* right;
 Sprite* jump;
+
+FMOD::System *systemFMOD = NULL;
+FMOD::Sound      *sound1, *sound2, *fire1, *fire2, *playerExplode, *playerdie, *maintheme, *victory, *super;
+FMOD::Channel    *channelSFX = 0, *channelMusic, *channelMusic2;
+FMOD_RESULT result;
+
 
 
 Game&
@@ -82,7 +95,11 @@ bool
 Game::Initialise()
 {
 
-	const int width = tileSize * 30;
+
+
+	
+
+	const int width = tileSize * 21;
 	const int height = tileSize * 16;
 
 	m_pBackBuffer = new BackBuffer();
@@ -121,13 +138,9 @@ Game::Initialise()
 	m_pPlayer->SetPositionY(tileSize * 14);
 	m_pPlayer->SetVerticalVelocity(2.0f);
 
-	// Load the alien ship sprite
+	//create map from file
+	ReadMap();
 	
-
-	//spawn all platforms
-	SpawnLevel();
-	//Spawn all enemies
-	SpawnAllEnemies();
 	
 
 	
@@ -139,60 +152,40 @@ Game::Initialise()
 	return (true);
 }
 
-void
-Game::SpawnAllEnemies()
+
+
+
+
+//read map from textfile
+void 
+Game::ReadMap()
 {
-	//SpawnEnemy(tileSize, tileSize * 10);
-	//SpawnEnemy(tileSize, tileSize * 13);
-	SpawnEnemy(tileSize * 15, tileSize * 14);
+	std::string line;
+	std::ifstream file("assets\\map.txt");
+	float y = 1;
+
+	if (file.is_open())
+	{
+		while (getline(file, line))
+		{
+			for (std::string::size_type i = 1; i < line.size()+1; ++i) 
+			{
+				if (line[i] == 'X')
+				{
+					//spawn platform
+					SpawnPlatform(tileSize *i-tileSize, tileSize *y);
+				}
+				else if (line[i] == 'E')
+				{
+					//spawn enemy
+					SpawnEnemy(tileSize * i- tileSize, tileSize * y);
+				}
+			}
+			y++;
+		}
+	}
 
 }
-
-
-void
-Game::SpawnLevel()
-{
-	SpawnPlatform(0.0f, tileSize * 15);
-	SpawnPlatform(tileSize, tileSize * 15);
-	SpawnPlatform(tileSize * 2, tileSize * 15);
-	SpawnPlatform(tileSize * 3, tileSize * 15);
-	SpawnPlatform(tileSize * 7, tileSize * 15);
-	SpawnPlatform(tileSize * 8, tileSize * 15);
-	SpawnPlatform(tileSize * 9, tileSize * 15);
-	SpawnPlatform(tileSize * 10, tileSize * 15);
-	SpawnPlatform(tileSize * 11, tileSize * 15);
-	SpawnPlatform(tileSize * 12, tileSize * 15);
-	SpawnPlatform(tileSize * 13, tileSize * 15);
-	SpawnPlatform(tileSize * 14, tileSize * 15);
-	SpawnPlatform(tileSize * 15, tileSize * 15);
-	SpawnPlatform(tileSize * 18, tileSize * 15);
-	SpawnPlatform(tileSize * 19, tileSize * 15);
-	SpawnPlatform(tileSize * 20, tileSize * 15);
-	SpawnPlatform(tileSize * 21, tileSize * 15);
-
-
-
-
-
-
-
-
-	SpawnPlatform(tileSize * 3, tileSize * 13);
-	SpawnPlatform(tileSize * 4, tileSize * 13);
-	SpawnPlatform(tileSize * 5, tileSize * 13);
-	SpawnPlatform(tileSize * 6, tileSize * 13);
-	SpawnPlatform(tileSize * 7, tileSize * 13);
-	SpawnPlatform(tileSize * 8, tileSize * 13);
-	SpawnPlatform(tileSize * 9, tileSize * 13);
-
-	SpawnPlatform(tileSize * 9, tileSize * 11);
-	SpawnPlatform(tileSize * 10, tileSize * 11);
-
-
-
-
-}
-
 
 
 bool 
@@ -246,19 +239,20 @@ Game::Process(float deltaTime)
 
 	// Update the game world simulation:
 
-	// Process each alien enemy in the container.
+	// Process each enemy in the container.
 	std::vector<Enemy*>::iterator enemyIterator;
-	for(enemyIterator = m_EnemyVector.begin();
-		enemyIterator != m_EnemyVector.end();
+	for (enemyIterator = m_EnemyVector.begin();
+	enemyIterator != m_EnemyVector.end();
 		++enemyIterator)
 	{
+		
 		(*enemyIterator)->Process(deltaTime);
 	}
 
 	// Process each bullet in the container.
 	std::vector<Bullet*>::iterator bulletIterator;
-	for(bulletIterator = m_BulletVector.begin();
-		bulletIterator != m_BulletVector.end();
+	for (bulletIterator = m_BulletVector.begin();
+	bulletIterator != m_BulletVector.end();
 		++bulletIterator)
 	{
 		(*bulletIterator)->Process(deltaTime);
@@ -267,7 +261,7 @@ Game::Process(float deltaTime)
 	std::vector<Platform*>::iterator platIterator;
 	for (platIterator = m_PlatVector.begin();
 	platIterator != m_PlatVector.end();
-	++platIterator)
+		++platIterator)
 	{
 		(*platIterator)->Process(deltaTime);
 	}
@@ -284,31 +278,31 @@ Game::Process(float deltaTime)
 	// Update the player object
 	m_pPlayer->Process(deltaTime);
 
-	
+
 
 	// Check for bullet vs alien enemy collisions...
 	// For each bullet
-	for(bulletIterator = m_BulletVector.begin();
-		bulletIterator != m_BulletVector.end();
+	for (bulletIterator = m_BulletVector.begin();
+	bulletIterator != m_BulletVector.end();
 		++bulletIterator)
 	{
 		// For each alien enemy
-		for(enemyIterator = m_EnemyVector.begin();
-			enemyIterator != m_EnemyVector.end();
+		for (enemyIterator = m_EnemyVector.begin();
+		enemyIterator != m_EnemyVector.end();
 			++enemyIterator)
 		{
 			// Check collision between two entities.	
-			if((*bulletIterator)->IsCollidingWith(*(*enemyIterator)) == true)
+			if ((*bulletIterator)->IsCollidingWith(*(*enemyIterator)) == true)
 			{
 				// If collided, destory both and spawn explosion.
 				SpawnExplosion((*enemyIterator)->GetPositionX(), (*enemyIterator)->GetPositionY());
 				(*bulletIterator)->SetDead(true);
 				(*enemyIterator)->SetDead(true);
-				
+
 			}
 		}
 	}
-	
+
 
 	//check for bullet vs platform
 	for (bulletIterator = m_BulletVector.begin();
@@ -325,39 +319,41 @@ Game::Process(float deltaTime)
 			{
 				// If collided, destory both and spawn explosion.
 				(*bulletIterator)->SetDead(true);
-				
-			}
-		}
-	}
-	//enemy vs plat
-	for (platIterator = m_PlatVector.begin();
-	platIterator != m_PlatVector.end();
-		++platIterator)
-	{
-		// For each alien enemy
-		for (enemyIterator = m_EnemyVector.begin();
-		enemyIterator != m_EnemyVector.end();
-			++enemyIterator)
-		{
-			// Check collision between two entities.	
-			if ((*enemyIterator)->IsCollidingWith(*(*platIterator)) == true)
-			{
-				float platPos = (*platIterator)->GetPositionY();
-				(*enemyIterator)->SetPositionY(platPos - tileSize);
 
 			}
 		}
 	}
+	//enemy vs plat
+	for (platIterator = m_PlatVector.begin(); platIterator != m_PlatVector.end(); ++platIterator)
+	{
+		// For each plat
+		for (enemyIterator = m_EnemyVector.begin(); enemyIterator != m_EnemyVector.end(); ++enemyIterator)
+		{
+			// Check collision between two entities.	
+			if ((*platIterator)->IsCollidingWith(*(*enemyIterator)) == true)
+			{
+				// If collided, set on top
+				(*enemyIterator)->SetPositionY((*platIterator)->GetPositionY() - tileSize);
+				if ((*platIterator)->GetPositionX() < 200)
+				{
+					(*enemyIterator)->SetHorizontalVelocity(3.0f);
+				}
+
+			}
+		}
+	}
+
+
+
+
 	//player vs enemy
 	for (enemyIterator = m_EnemyVector.begin(); enemyIterator != m_EnemyVector.end(); ++enemyIterator)
 	{
 		if ((*enemyIterator)->IsCollidingWith(*m_pPlayer))
 		{
-			SpawnExplosion(m_pPlayer->GetPositionX(),m_pPlayer->GetPositionY());
+			SpawnExplosion(m_pPlayer->GetPositionX(), m_pPlayer->GetPositionY());
 			m_pPlayer->SetPositionX(tileSize);
 			m_pPlayer->SetPositionY(tileSize);
-
-
 		}
 	}
 
@@ -368,10 +364,7 @@ Game::Process(float deltaTime)
 		{
 			float platPos = (*platIterator)->GetPositionY();
 			float platxPos = (*platIterator)->GetPositionX();
-
 			//right collision
-			
-			
 			if (m_pPlayer->GetPositionY() > (*platIterator)->GetPositionY())
 			{
 				m_pPlayer->SetPositionY(platPos + tileSize);
@@ -384,11 +377,9 @@ Game::Process(float deltaTime)
 				else if (m_pPlayer->GetPositionX() > (*platIterator)->GetPositionX())
 				{
 					m_pPlayer->SetVerticalVelocity(2.0f);
-
 				}
-				
 			}
-			else 
+			else
 			{
 				m_pPlayer->SetPositionY(platPos - tileSize);
 				if (m_pPlayer->GetPositionX() < (*platIterator)->GetPositionX())
@@ -399,12 +390,15 @@ Game::Process(float deltaTime)
 				else if (m_pPlayer->GetPositionX() > (*platIterator)->GetPositionX())
 				{
 					m_pPlayer->SetVerticalVelocity(2.0f);
-
 				}
-				
 			}
 		}
 	}
+
+
+
+
+
 
 	// Remove any dead bullets from the container...
 	bulletIterator = m_BulletVector.begin();
@@ -439,15 +433,17 @@ Game::Process(float deltaTime)
 	}
 	//remove explosions
 	std::vector<Explosion*>::iterator explosionIterator;
-	for (explosionIterator = Explosions.begin(); explosionIterator != Explosions.end();) {
-
+	for (explosionIterator = Explosions.begin(); explosionIterator != Explosions.end();) 
+	{
 		Explosion* explode = *explosionIterator;
 
-		if (explode->IsDead()) {
+		if (explode->IsDead()) 
+		{
 			delete explode;
 			explosionIterator = Explosions.erase(explosionIterator);
 		}
-		else {
+		else 
+		{
 			explosionIterator++;
 		}
 
@@ -586,7 +582,7 @@ void
 Game::StopSpaceShipMovement()
 {
 	m_pPlayer->SetHorizontalVelocity(0.0f);
-	//m_pPlayer->SetVerticalVelocity(0.0f);
+	
 }
 
 
@@ -598,6 +594,7 @@ Game::SpawnPlatform(float x, float y)
 	plat->Initialise(platSprite);
 	plat->SetPositionX(x);
 	plat->SetPositionY(y);
+	plat->SetHorizontalVelocity(-0.5f);
 	m_PlatVector.push_back(plat);
 	
 }
@@ -606,10 +603,11 @@ void
 Game::SpawnEnemy(float x, float y)
 {
 	Enemy* e = new Enemy();
-	Sprite* pAlienSprite = m_pBackBuffer->CreateSprite("assets\\rabbit.png");
-	e->Initialise(pAlienSprite);
+	Sprite* rabbitLeft = m_pBackBuffer->CreateSprite("assets\\rabbit.png");
+	e->Initialise(rabbitLeft);
 	e->SetPositionX(x);
 	e->SetPositionY(y);
+	e->SetHorizontalVelocity(-0.5f);
 	m_EnemyVector.push_back(e);
 }
 

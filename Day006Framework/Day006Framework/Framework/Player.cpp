@@ -73,10 +73,9 @@ Player::Process(float deltaTime)
 	// : Boundary checking and position capping. 
 	if (m_x > 800)
 	{
-		// If the entity is going to go out of bounds bonce the entity
-		// back along the direction that it hit the boundary
+	
 		m_x = 800;
-		m_velocityX *= -1.0f;
+	
 	}
 	else if (m_x < 0)
 	{
