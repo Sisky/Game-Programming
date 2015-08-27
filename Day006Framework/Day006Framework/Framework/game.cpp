@@ -13,6 +13,8 @@
 #include "Bullet.h"
 #include "Background.h"
 #include "Platform.h"
+#include "Enemy.h"
+
 
 // Library includes:
 #include <cassert>
@@ -22,6 +24,9 @@
 // Static Members:
 Game* Game::sm_pInstance = 0;
 const float tileSize = 36;
+Sprite* left;
+Sprite* right;
+Sprite* jump;
 
 
 Game&
@@ -106,23 +111,24 @@ Game::Initialise()
 
 	
 	// Load the player sprite
-	Sprite* pPlayerSprite = m_pBackBuffer->CreateSprite("assets\\Player.png");
+	right = m_pBackBuffer->CreateSprite("assets\\Player.png");
+	left = m_pBackBuffer->CreateSprite("assets\\PlayerRight.png");
 
 	//Create the player sprite and set the position
 	m_pPlayer = new Player();
-	m_pPlayer->Initialise(pPlayerSprite);
+	m_pPlayer->Initialise(right);
 	m_pPlayer->SetPositionX(tileSize);
 	m_pPlayer->SetPositionY(tileSize * 14);
-
+	m_pPlayer->SetVerticalVelocity(2.0f);
 
 	// Load the alien ship sprite
-	SpawnPlatform(0.0f , tileSize * 15);
-	SpawnPlatform(tileSize, tileSize * 15);
-	SpawnPlatform(tileSize*2, tileSize * 15);
-	SpawnPlatform(tileSize*3, tileSize * 15);
-	SpawnPlatform(tileSize * 3, tileSize * 13);
-	SpawnEnemy(700.0f, 500.0f);
-	SpawnEnemy(500.0f, 500.0f);
+	
+
+	//spawn all platforms
+	SpawnLevel();
+	//Spawn all enemies
+	SpawnAllEnemies();
+	
 
 	
 
@@ -132,6 +138,62 @@ Game::Initialise()
 
 	return (true);
 }
+
+void
+Game::SpawnAllEnemies()
+{
+	//SpawnEnemy(tileSize, tileSize * 10);
+	//SpawnEnemy(tileSize, tileSize * 13);
+	SpawnEnemy(tileSize * 15, tileSize * 14);
+
+}
+
+
+void
+Game::SpawnLevel()
+{
+	SpawnPlatform(0.0f, tileSize * 15);
+	SpawnPlatform(tileSize, tileSize * 15);
+	SpawnPlatform(tileSize * 2, tileSize * 15);
+	SpawnPlatform(tileSize * 3, tileSize * 15);
+	SpawnPlatform(tileSize * 7, tileSize * 15);
+	SpawnPlatform(tileSize * 8, tileSize * 15);
+	SpawnPlatform(tileSize * 9, tileSize * 15);
+	SpawnPlatform(tileSize * 10, tileSize * 15);
+	SpawnPlatform(tileSize * 11, tileSize * 15);
+	SpawnPlatform(tileSize * 12, tileSize * 15);
+	SpawnPlatform(tileSize * 13, tileSize * 15);
+	SpawnPlatform(tileSize * 14, tileSize * 15);
+	SpawnPlatform(tileSize * 15, tileSize * 15);
+	SpawnPlatform(tileSize * 18, tileSize * 15);
+	SpawnPlatform(tileSize * 19, tileSize * 15);
+	SpawnPlatform(tileSize * 20, tileSize * 15);
+	SpawnPlatform(tileSize * 21, tileSize * 15);
+
+
+
+
+
+
+
+
+	SpawnPlatform(tileSize * 3, tileSize * 13);
+	SpawnPlatform(tileSize * 4, tileSize * 13);
+	SpawnPlatform(tileSize * 5, tileSize * 13);
+	SpawnPlatform(tileSize * 6, tileSize * 13);
+	SpawnPlatform(tileSize * 7, tileSize * 13);
+	SpawnPlatform(tileSize * 8, tileSize * 13);
+	SpawnPlatform(tileSize * 9, tileSize * 13);
+
+	SpawnPlatform(tileSize * 9, tileSize * 11);
+	SpawnPlatform(tileSize * 10, tileSize * 11);
+
+
+
+
+}
+
+
 
 bool 
 Game::DoGameLoop()
@@ -185,7 +247,7 @@ Game::Process(float deltaTime)
 	// Update the game world simulation:
 
 	// Process each alien enemy in the container.
-	std::vector<Entity*>::iterator enemyIterator;
+	std::vector<Enemy*>::iterator enemyIterator;
 	for(enemyIterator = m_EnemyVector.begin();
 		enemyIterator != m_EnemyVector.end();
 		++enemyIterator)
@@ -213,7 +275,7 @@ Game::Process(float deltaTime)
 	// Update the player object
 	m_pPlayer->Process(deltaTime);
 
-	//check for player vs platform
+	
 
 	// Check for bullet vs alien enemy collisions...
 	// For each bullet
@@ -235,17 +297,101 @@ Game::Process(float deltaTime)
 			}
 		}
 	}
-		//if collides with plat put on top
-		for (platIterator = m_PlatVector.begin(); platIterator != m_PlatVector.end(); ++platIterator)
-		{
-			if ((*platIterator)->IsCollidingWith(*m_pPlayer))
-			{
-				float platPos = (*platIterator)->GetPositionY();
+	
 
-				m_pPlayer->SetPositionY(platPos - tileSize);
-				StopSpaceShipMovement();
+	//check for bullet vs platform
+	for (bulletIterator = m_BulletVector.begin();
+	bulletIterator != m_BulletVector.end();
+		++bulletIterator)
+	{
+		// For each alien enemy
+		for (platIterator = m_PlatVector.begin();
+		platIterator != m_PlatVector.end();
+			++platIterator)
+		{
+			// Check collision between two entities.	
+			if ((*bulletIterator)->IsCollidingWith(*(*platIterator)) == true)
+			{
+				// If collided, destory both and spawn explosion.
+				(*bulletIterator)->SetDead(true);
+				
 			}
 		}
+	}
+	//enemy vs plat
+	for (platIterator = m_PlatVector.begin();
+	platIterator != m_PlatVector.end();
+		++platIterator)
+	{
+		// For each alien enemy
+		for (enemyIterator = m_EnemyVector.begin();
+		enemyIterator != m_EnemyVector.end();
+			++enemyIterator)
+		{
+			// Check collision between two entities.	
+			if ((*enemyIterator)->IsCollidingWith(*(*platIterator)) == true)
+			{
+				float platPos = (*platIterator)->GetPositionY();
+				(*enemyIterator)->SetPositionY(platPos - tileSize);
+
+			}
+		}
+	}
+	//player vs enemy
+	for (enemyIterator = m_EnemyVector.begin(); enemyIterator != m_EnemyVector.end(); ++enemyIterator)
+	{
+		if ((*enemyIterator)->IsCollidingWith(*m_pPlayer))
+		{
+			m_pPlayer->SetPositionX(tileSize);
+			m_pPlayer->SetPositionY(tileSize);
+
+		}
+	}
+
+	//player vs plat
+	for (platIterator = m_PlatVector.begin(); platIterator != m_PlatVector.end(); ++platIterator)
+	{
+		if ((*platIterator)->IsCollidingWith(*m_pPlayer))
+		{
+			float platPos = (*platIterator)->GetPositionY();
+			float platxPos = (*platIterator)->GetPositionX();
+
+			//right collision
+			
+			
+			if (m_pPlayer->GetPositionY() > (*platIterator)->GetPositionY())
+			{
+				m_pPlayer->SetPositionY(platPos + tileSize);
+				if (m_pPlayer->GetPositionX() < (*platIterator)->GetPositionX())
+				{
+					//m_pPlayer->SetPositionX(platxPos + tileSize);
+
+					m_pPlayer->SetVerticalVelocity(2.0f);
+				}
+				else if (m_pPlayer->GetPositionX() > (*platIterator)->GetPositionX())
+				{
+					m_pPlayer->SetVerticalVelocity(2.0f);
+
+				}
+				
+			}
+			else 
+			{
+				m_pPlayer->SetPositionY(platPos - tileSize);
+				if (m_pPlayer->GetPositionX() < (*platIterator)->GetPositionX())
+				{
+
+					m_pPlayer->SetVerticalVelocity(2.0f);
+				}
+				else if (m_pPlayer->GetPositionX() > (*platIterator)->GetPositionX())
+				{
+					m_pPlayer->SetVerticalVelocity(2.0f);
+
+				}
+				
+			}
+		}
+	}
 
 	// Remove any dead bullets from the container...
 	bulletIterator = m_BulletVector.begin();
@@ -292,22 +438,12 @@ Game::Draw(BackBuffer& backBuffer)
 	bg->Draw(*m_pBackBuffer);
 	
 	// Draw all enemy aliens in container...
-	std::vector<Entity*>::iterator enemyIterator;
+	std::vector<Enemy*>::iterator enemyIterator;
 	for(enemyIterator = m_EnemyVector.begin();
 		enemyIterator != m_EnemyVector.end();
 		++enemyIterator)
 	{
 		(*enemyIterator)->Draw(backBuffer);
-	}
-
-
-	// Draw all bullets in container...
-	std::vector<Bullet*>::iterator bulletIterator;
-	for(bulletIterator = m_BulletVector.begin();
-		bulletIterator != m_BulletVector.end();
-		++bulletIterator)
-	{
-		(*bulletIterator)->Draw(backBuffer);
 	}
 	//draw platfomrs 
 	std::vector<Platform*>::iterator platIterator;
@@ -317,6 +453,16 @@ Game::Draw(BackBuffer& backBuffer)
 	{
 		(*platIterator)->Draw(backBuffer);
 	}
+
+	// Draw all bullets in container...
+	std::vector<Bullet*>::iterator bulletIterator;
+	for(bulletIterator = m_BulletVector.begin();
+		bulletIterator != m_BulletVector.end();
+		++bulletIterator)
+	{
+		(*bulletIterator)->Draw(backBuffer);
+	}
+	
 	
 
 	// Draw the player ship...
@@ -337,7 +483,8 @@ void
 Game::MoveSpaceShipLeft()
 {
 	// Tell the player ship to move left.
-	m_pPlayer->SetHorizontalVelocity(-2.0f);        
+	m_pPlayer->SetHorizontalVelocity(-2.0f);      
+	m_pPlayer->Initialise(left);
 }
 
 //Add the method to tell the player ship to move right...
@@ -345,14 +492,16 @@ void
 Game::MoveSpaceShipRight()
 {
 	// Tell the player ship to move left.
-	m_pPlayer->SetHorizontalVelocity(2.0f);        
+	m_pPlayer->SetHorizontalVelocity(2.0f);      
+	m_pPlayer->Initialise(right);
 }
 void
 Game::Jump()
 {
-	
-	m_pPlayer->SetVerticalVelocity(-2.0f);
-	
+	if (!m_pPlayer->IsJumping())
+	{
+		m_pPlayer->SetJumping(true);
+	}
 	
 }
 // Space a Bullet in game.
@@ -381,7 +530,7 @@ void
 Game::StopSpaceShipMovement()
 {
 	m_pPlayer->SetHorizontalVelocity(0.0f);
-	m_pPlayer->SetVerticalVelocity(0.0f);
+	//m_pPlayer->SetVerticalVelocity(0.0f);
 }
 
 

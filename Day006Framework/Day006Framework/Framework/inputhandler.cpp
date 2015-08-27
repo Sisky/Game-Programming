@@ -116,7 +116,7 @@ InputHandler::ProcessInput(Game& game)
 			
 				{
 					// Move Right
-					game.StopSpaceShipMovement();
+				game.StopSpaceShipMovement();
 				}
 				break;
 			}

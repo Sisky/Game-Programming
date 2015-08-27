@@ -48,6 +48,7 @@ protected:
 
 	float m_x;
 	float m_y;
+	float jumpTimer;
 
 	float m_velocityX;
 	float m_velocityY;

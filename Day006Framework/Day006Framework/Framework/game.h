@@ -14,6 +14,7 @@ class Entity;
 class Bullet;
 class Background;
 class Platform;
+class Enemy;
 
 class Game
 {
@@ -36,6 +37,8 @@ public:
 	void SpawnEnemy(float x, float y);
 	void SpawnExplosion(int x, int y);
 	void SpawnPlatform(float x, float y);
+	void SpawnLevel();
+	void SpawnAllEnemies();
 
 protected:
 	void Process(float deltaTime);
@@ -73,7 +76,7 @@ protected:
 
 
 	// Add an alien enemy container field.
-	std::vector<Entity*> m_EnemyVector;
+	std::vector<Enemy*> m_EnemyVector;
 	//platforms
 	std::vector<Platform*> m_PlatVector;
 

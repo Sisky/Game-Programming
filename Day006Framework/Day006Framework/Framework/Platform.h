@@ -1,6 +1,7 @@
 #ifndef __PLATFORM_H__
 #define __PLATFORM_H__
 #include "entity.h"
+#include "player.h"
 
 
 class Platform : public Entity
@@ -10,6 +11,7 @@ public:
 	~Platform();
 
 	void Process(float deltatick);
+	bool IsCollidingWith(Entity& e);
 
 protected:
 

@@ -15,6 +15,11 @@ public:
 	~Player();
 
 	void Process(float deltaTime);
+	void SetJumping(bool jump);
+	bool IsJumping();
+	bool jumping;
+	void SetJumpTimer(float time);
+	
 
 };
 
